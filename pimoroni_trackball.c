@@ -1,6 +1,8 @@
 #include "pimoroni_trackball.h"
 #include "i2c_master.h"
 
+#include <print.h>
+
 static uint8_t scrolling      = 0;
 static int16_t x_offset       = 0;
 static int16_t y_offset       = 0;
@@ -71,28 +73,42 @@ int16_t get_speed(const struct Speed* speeds, int8_t length, int16_t val)
 }
 
 const struct Speed x_speeds[] = {
-    { .value = 10, .multiplier = 1 },
-    { .value = 100, .multiplier = 2 },
-    { .value = 150, .multiplier = 4 },
+    { .value = 3, .multiplier = 1 },
+    { .value = 5, .multiplier = 2 },
+    { .value = 6, .multiplier = 4 },
     { .value = 0, .multiplier = 8 },
 };
 
 const struct Speed y_speeds[] = {
-    { .value = 10, .multiplier = 1 },
-    { .value = 100, .multiplier = 6 },
+    { .value = 2, .multiplier = 1 },
+    { .value = 4, .multiplier = 6 },
     { .value = 0, .multiplier = 10 },
 };
 
 #define ARRAY_LENGTH(X) (sizeof(X) / sizeof(X[0]))
 
+// static uint16_t counter = 0;
+// static uint16_t calls = 0;
+
 void pointing_device_task(void) {
     //static bool debounce;
     //static uint16_t debounce_timer;
+    /*++calls;
+    uint16_t elapsed = timer_elapsed(counter);
+    if (elapsed > 1000)
+    {
+        uprintf("mouse hz %u\n", calls);
+        calls = 0;
+        counter = timer_read();
+    }*/
     uint8_t state[5] = {};
     if (i2c_readReg(TRACKBALL_WRITE, 0x04, state, 5, I2C_TIMEOUT) == I2C_STATUS_SUCCESS) {
         //if (!state[4] && !debounce) {
             int16_t x = state[2] - state[3];
             int16_t y = state[1] - state[0];
+            if (x != 0 || y != 0) {
+                uprintf("x %d y %d\n", x, y);
+            }
             int8_t sx = x < 0 ? -1 : 1;
             int8_t sy = y < 0 ? -1 : 1;
             // Apply the multiplier in stages:
