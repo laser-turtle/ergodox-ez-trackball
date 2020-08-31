@@ -1,7 +1,9 @@
 #include "pimoroni_trackball.h"
 #include "i2c_master.h"
 
-#include <print.h>
+#ifdef DEBUG_POLLING
+    #include <print.h>
+#endif
 
 static uint8_t scrolling      = 0;
 static int16_t x_offset       = 0;
@@ -10,6 +12,7 @@ static int16_t h_offset       = 0;
 static int16_t v_offset       = 0;
 static int16_t precisionSpeed = 0;
 
+static bool dirty = false;
 static bool left_down = false;
 static bool right_down = false;
 static bool middle_down = false;
@@ -41,131 +44,120 @@ void    trackball_set_precision(int16_t precision) { precisionSpeed = precision;
 bool    trackball_is_scrolling(void) { return scrolling; }
 void    trackball_set_scrolling(bool scroll) { scrolling = scroll; }
 
-void trackball_set_left(bool pressed) { left_down = pressed; }
-void trackball_set_right(bool pressed) { right_down = pressed; }
-void trackball_set_middle(bool pressed) { middle_down = pressed; }
+void trackball_set_left(bool pressed) { 
+    dirty |= pressed != left_down;
+    left_down = pressed; 
+}
+void trackball_set_right(bool pressed) { 
+    dirty |= pressed != right_down;
+    right_down = pressed; 
+}
+void trackball_set_middle(bool pressed) { 
+    dirty |= pressed != middle_down;
+    middle_down = pressed; 
+}
 
 __attribute__((weak)) void pointing_device_init(void) { trackball_set_rgbw(0x00,0x00,0x00,0x00); }
 
-/*int16_t get_speed(int16_t val)
-{
-    if (val < 0) { val = -val; }
-    if (val < 10) { return 1; }
-    if (val < 100) { return 4; }
-    return 8;
-}*/
-
-struct Speed {
-    int16_t value;
-    int16_t multiplier;
-};
-
-int16_t get_speed(const struct Speed* speeds, int8_t length, int16_t val)
-{
-    if (val < 0) { val = -val; }
-    for (int16_t i = 0; i < length - 1; ++i) {
-        if (val < speeds[i].value) {
-            return speeds[i].multiplier;
-        }
-    }
-
-    return speeds[length-1].multiplier;
+inline int16_t max(int16_t x, int16_t y) {
+    return x < y ? y : x;
 }
 
-const struct Speed x_speeds[] = {
-    { .value = 3, .multiplier = 1 },
-    { .value = 5, .multiplier = 2 },
-    { .value = 6, .multiplier = 4 },
-    { .value = 0, .multiplier = 8 },
-};
-
-const struct Speed y_speeds[] = {
-    { .value = 2, .multiplier = 1 },
-    { .value = 4, .multiplier = 6 },
-    { .value = 0, .multiplier = 10 },
-};
-
-#define ARRAY_LENGTH(X) (sizeof(X) / sizeof(X[0]))
-
-// static uint16_t counter = 0;
-// static uint16_t calls = 0;
+uint16_t poll_timer = 0;
+uint16_t poll_count = 0;
+static bool trackball_pressed_prev = false;
 
 void pointing_device_task(void) {
-    //static bool debounce;
-    //static uint16_t debounce_timer;
-    /*++calls;
-    uint16_t elapsed = timer_elapsed(counter);
-    if (elapsed > 1000)
+
+#ifdef DEBUG_POLLING
+    if (timer_elapsed(poll_timer) >= 1000)
     {
-        uprintf("mouse hz %u\n", calls);
-        calls = 0;
-        counter = timer_read();
-    }*/
+        poll_timer = timer_read();
+        uprintf("Poll count %u\n", poll_count);
+        poll_count = 0;
+    }
+    ++poll_count;
+#endif
+    
     uint8_t state[5] = {};
     if (i2c_readReg(TRACKBALL_WRITE, 0x04, state, 5, I2C_TIMEOUT) == I2C_STATUS_SUCCESS) {
-        //if (!state[4] && !debounce) {
             int16_t x = state[2] - state[3];
             int16_t y = state[1] - state[0];
             if (x != 0 || y != 0) {
-                uprintf("x %d y %d\n", x, y);
+                //uprintf("x %d y %d\n", x, y);
+                dirty = true;
             }
             int8_t sx = x < 0 ? -1 : 1;
             int8_t sy = y < 0 ? -1 : 1;
-            // Apply the multiplier in stages:
-            // 0-100 1x
-            // 100-300 2x
-            // 400+ 8x or something like that
             if (scrolling) {
                 x = x * x / 2 * (1 + precisionSpeed) * sx;
                 y = y * y / 2 * (1 + precisionSpeed) * sy;
                 h_offset -= x;
                 v_offset += y;
             } else {
-                int16_t xspeed = get_speed(&x_speeds[0], ARRAY_LENGTH(x_speeds), x);
-                int16_t yspeed = get_speed(&y_speeds[0], ARRAY_LENGTH(y_speeds), y);
-                x = x * x * (xspeed + precisionSpeed) * sx;
-                y = y * y * (yspeed + precisionSpeed) * sy;
-                //x = x * x * precisionSpeed * sx;
-                //y = y * y * precisionSpeed * sy;
+                // This seems to feel OK if mouse acceleration is turned on
+                // Seems to be okay at the same mouse acceleration as the
+                // laptop trackpad
+                x = x * x * (1 + precisionSpeed) * sx;
+                y = y * y * (1 + precisionSpeed) * sy;
+
+                /* 2^x doesn't feel that great
+                if (x != 0) {
+                    x = abs(x) & 0xF;
+                    x = ((1 << (x-1)) + precisionSpeed*x) * sx;
+                }
+
+                if (y != 0) {
+                    y = abs(y) & 0xF;
+                    y = ((1 << (y-1)) + precisionSpeed*y) * sy;
+                }
+                */
+
+                // Mouse is rotated a bit
                 x_offset -= x;
                 y_offset -= y;
             }
-        //} else {
-        //    if (state[4]) {
-        //        debounce = true;
-        //        debounce_timer = timer_read();
-        //    }
-//        }
     }
-
-    //if (timer_elapsed(debounce_timer) > MOUSE_DEBOUNCE) debounce = false;
-
-    report_mouse_t mouse = pointing_device_get_report();
 
     const bool trackball_pressed = state[4] & (1 << 7);
-    if (trackball_pressed || left_down) {
-        mouse.buttons |= MOUSE_BTN1;
-    } else {
-        mouse.buttons &= ~MOUSE_BTN1;
+    dirty |= trackball_pressed_prev != trackball_pressed;
+    trackball_pressed_prev = trackball_pressed;
+    // If we don't need to send a report, don't.
+    // Seems to speed up the keyboard polling
+    // by 6-7x from 125hz (USB polling speed)
+    // to ~680hz. Granted it lowers back down
+    // when using the mouse. But should make
+    // the keyboard a bit more responsive when
+    // not using the mouse.
+    if (dirty) {
+        dirty = false;
+
+        report_mouse_t mouse = pointing_device_get_report();
+
+        if (trackball_pressed || left_down) {
+            mouse.buttons |= MOUSE_BTN1;
+        } else {
+            mouse.buttons &= ~MOUSE_BTN1;
+        }
+
+        if (right_down) {
+            mouse.buttons |= MOUSE_BTN2;
+        } else {
+            mouse.buttons &= ~MOUSE_BTN2;
+        }
+
+        if (middle_down) {
+            mouse.buttons |= MOUSE_BTN3;
+        } else {
+            mouse.buttons &= ~MOUSE_BTN3;
+        }
+
+        update_member(&mouse.x, &x_offset);
+        update_member(&mouse.y, &y_offset);
+        update_member(&mouse.h, &h_offset);
+        update_member(&mouse.v, &v_offset);
+
+        pointing_device_set_report(mouse);
+        pointing_device_send();
     }
-
-    if (right_down) {
-        mouse.buttons |= MOUSE_BTN2;
-    } else {
-        mouse.buttons &= ~MOUSE_BTN2;
-    }
-
-    if (middle_down) {
-        mouse.buttons |= MOUSE_BTN3;
-    } else {
-        mouse.buttons &= ~MOUSE_BTN3;
-    }
-
-    update_member(&mouse.x, &x_offset);
-    update_member(&mouse.y, &y_offset);
-    update_member(&mouse.h, &h_offset);
-    update_member(&mouse.v, &v_offset);
-
-    pointing_device_set_report(mouse);
-    pointing_device_send();
 }

@@ -44,6 +44,7 @@ enum custom_keycodes {
   HSV_27_255_255,
   PM_SCROLL,
   PM_PRECISION,
+  PM_PRECISION_2,
   PM_LEFT,
   PM_RIGHT,
   PM_MIDDLE,
@@ -72,7 +73,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
   [2] = LAYOUT_ergodox_pretty(
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, RESET,
-    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, PM_PRECISION,           KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_MEDIA_PLAY_PAUSE,KC_UP,          KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, PM_PRECISION,           PM_PRECISION_2, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_MEDIA_PLAY_PAUSE,KC_UP,          KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
     KC_TRANSPARENT, KC_TRANSPARENT, PM_RIGHT,     PM_MIDDLE,     PM_LEFT,     PM_SCROLL,                                                                           KC_MEDIA_PREV_TRACK,KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_MEDIA_NEXT_TRACK,KC_MEDIA_PLAY_PAUSE,
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
     KC_TRANSPARENT, WEBUSB_PAIR,    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                                                                                 KC_TRANSPARENT, KC_AUDIO_VOL_DOWN,KC_AUDIO_VOL_UP,KC_AUDIO_MUTE,  KC_TRANSPARENT,
@@ -139,7 +140,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	  return false;
 	case PM_PRECISION:
 	  if (record->event.pressed) {
-		trackball_set_precision(7);
+		trackball_set_precision(15);
+	  } else {
+		trackball_set_precision(0);
+	  }
+	  run_trackball_cleanup();
+	  return false;
+	case PM_PRECISION_2:
+	  if (record->event.pressed) {
+		trackball_set_precision(8);
 	  } else {
 		trackball_set_precision(0);
 	  }
