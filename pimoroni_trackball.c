@@ -1,3 +1,5 @@
+#ifdef PIMORONI_TRACKBALL_ENABLE
+
 #include "pimoroni_trackball.h"
 #include "i2c_master.h"
 
@@ -92,8 +94,8 @@ void pointing_device_task(void) {
             if (scrolling) {
                 x = abs(x);
                 y = abs(y);
-                x = x * max(x / 8, 1) * (1 + precisionSpeed) * sx;
-                y = y * max(y / 8, 1) * (1 + precisionSpeed) * sy;
+                x = x * (1 + precisionSpeed) * sx;
+                y = y * (1 + precisionSpeed) * sy;
                 h_offset -= x;
                 v_offset += y;
             } else {
@@ -163,3 +165,4 @@ void pointing_device_task(void) {
         pointing_device_send();
     }
 }
+#endif
