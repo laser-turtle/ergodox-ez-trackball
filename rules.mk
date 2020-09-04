@@ -14,4 +14,4 @@ OPT_DEFS += -DPIMORONI_TRACKBALL_ENABLE
 SRC += pimoroni_trackball.c
 QUANTUM_LIB_SRC += i2c_master.c
 
-CONSOLE_ENABLE = yes
+#CONSOLE_ENABLE = yes

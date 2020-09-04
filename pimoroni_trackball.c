@@ -92,8 +92,8 @@ void pointing_device_task(void) {
             if (scrolling) {
                 x = abs(x);
                 y = abs(y);
-                x = x * max(x / 2, 1) * (1 + precisionSpeed) * sx;
-                y = y * max(y / 2, 1) * (1 + precisionSpeed) * sy;
+                x = x * max(x / 8, 1) * (1 + precisionSpeed) * sx;
+                y = y * max(y / 8, 1) * (1 + precisionSpeed) * sy;
                 h_offset -= x;
                 v_offset += y;
             } else {

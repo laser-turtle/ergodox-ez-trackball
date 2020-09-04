@@ -45,6 +45,7 @@ enum custom_keycodes {
   PM_SCROLL,
   PM_PRECISION,
   PM_PRECISION_2,
+  PM_PRECISION_3,
   PM_LEFT,
   PM_RIGHT,
   PM_MIDDLE,
@@ -53,11 +54,11 @@ enum custom_keycodes {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_ergodox_pretty(
     KC_GRAVE,       KC_1,           KC_2,           KC_3,           KC_4,           KC_5,           KC_6,                                           KC_7,           KC_8,           KC_9,           KC_0,           KC_MINUS,       KC_EQUAL,       KC_DELETE,
-    KC_TAB,         KC_Q,           KC_W,           KC_E,           KC_R,           KC_T,           TG(1),                                          TG(2),          KC_Y,           KC_U,           KC_I,           KC_O,           KC_P,           KC_BSLASH,
+    KC_TAB,         KC_Q,           KC_W,           KC_E,           KC_R,           KC_T,           KC_HYPR,                                        KC_MEH,         KC_Y,           KC_U,           KC_I,           KC_O,           KC_P,           KC_BSLASH,
     TT(2),          KC_A,           KC_S,           KC_D,           KC_F,           KC_G,                                                                           KC_H,           KC_J,           KC_K,           KC_L,           KC_SCOLON,      KC_ENTER,
-    KC_LSHIFT,      LCTL_T(KC_Z),   KC_X,           KC_C,           KC_V,           KC_B,           KC_HYPR,                                        KC_MEH,         KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_QUES,        KC_RSHIFT,
-    LT(1,KC_GRAVE), KC_QUOTE,       LALT(KC_LSHIFT),KC_LALT,        KC_LGUI,                                                                                                        KC_TRANSPARENT, KC_DOWN,        KC_LBRACKET,    KC_RBRACKET,    MO(1),
-                                                                                                    LALT_T(KC_APPLICATION),KC_LGUI,        KC_LALT,        LCTL_T(KC_ESCAPE),
+    KC_LSHIFT,      LCTL_T(KC_Z),   KC_X,           KC_C,           KC_V,           KC_B,           TG(1),                                          TG(4),          KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       KC_RSHIFT,
+    LT(1,KC_GRAVE), KC_QUOTE,       LALT(KC_LSHIFT),KC_LALT,        KC_LGUI,                                                                                                        KC_TRANSPARENT, KC_DOWN,        KC_LBRACKET,    KC_RBRACKET,    TT(3),
+                                                                                                    LALT_T(KC_APPLICATION),KC_LGUI,        KC_LALT,        LCTL_T(KC_NO),
                                                                                                                     KC_HOME,        KC_PGUP,
                                                                                     KC_SPACE,       KC_BSPACE,      KC_END,         KC_PGDOWN,      KC_ESCAPE,      KC_ENTER
   ),
@@ -72,17 +73,36 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                                                                     RGB_VAD,        RGB_VAI,        HSV_27_255_255, KC_TRANSPARENT, RGB_HUD,        RGB_HUI
   ),
   [2] = LAYOUT_ergodox_pretty(
-    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, RESET,
-    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, PM_PRECISION,           PM_PRECISION_2, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_MEDIA_PLAY_PAUSE,KC_UP,          KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-    KC_TRANSPARENT, KC_TRANSPARENT, PM_RIGHT,     PM_MIDDLE,     PM_LEFT,     PM_SCROLL,                                                                           KC_MEDIA_PREV_TRACK,KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_MEDIA_NEXT_TRACK,KC_MEDIA_PLAY_PAUSE,
+    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_TRANSPARENT, PM_PRECISION, PM_PRECISION_2,           PM_PRECISION_3, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_MEDIA_PLAY_PAUSE,KC_UP,          KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_TRANSPARENT, PM_RIGHT,     PM_MIDDLE,     PM_LEFT,     KC_O,                                                                           KC_MEDIA_PREV_TRACK,KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_MEDIA_NEXT_TRACK,KC_MEDIA_PLAY_PAUSE,
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
     KC_TRANSPARENT, WEBUSB_PAIR,    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                                                                                 KC_TRANSPARENT, KC_AUDIO_VOL_DOWN,KC_AUDIO_VOL_UP,KC_AUDIO_MUTE,  KC_TRANSPARENT,
                                                                                                     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
                                                                                                                     KC_TRANSPARENT, KC_TRANSPARENT,
-                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_WWW_BACK
+                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
+  ),
+  [3] = LAYOUT_ergodox_pretty(
+    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, RESET,
+    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                                                                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+                                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+                                                                                                                    KC_TRANSPARENT, KC_TRANSPARENT,
+                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
+  ),
+  [4] = LAYOUT_ergodox_pretty(
+    KC_TRANSPARENT, TO(0),          KC_1,           KC_2,           KC_3,           KC_4,           KC_5,                                           KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_I,           KC_Q,           KC_W,           KC_E,           KC_R,           KC_G,                                           KC_Y,           PM_MIDDLE,     PM_LEFT,     KC_UP,          PM_RIGHT,     KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_T,           KC_A,           KC_S,           KC_D,           KC_F,                                                                           KC_TRANSPARENT, KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_O,           KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,                                           KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_J,           KC_K,           KC_TRANSPARENT, KC_O,
+    KC_TRANSPARENT, KC_TRANSPARENT, PM_MIDDLE, PM_RIGHT, PM_LEFT,                                                                                                 KC_TRANSPARENT, KC_L,           KC_TRANSPARENT, KC_TRANSPARENT, KC_U,
+                                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+                                                                                                                    KC_TRANSPARENT, KC_TRANSPARENT,
+                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
   ),
 };
-
 
 void run_trackball_cleanup(void) {
     if (trackball_is_scrolling()) {
@@ -140,7 +160,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	  return false;
 	case PM_PRECISION:
 	  if (record->event.pressed) {
-		trackball_set_precision(15);
+		trackball_set_precision(2);
 	  } else {
 		trackball_set_precision(0);
 	  }
@@ -149,6 +169,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	case PM_PRECISION_2:
 	  if (record->event.pressed) {
 		trackball_set_precision(8);
+	  } else {
+		trackball_set_precision(0);
+	  }
+	  run_trackball_cleanup();
+	  return false;
+	case PM_PRECISION_3:
+	  if (record->event.pressed) {
+		trackball_set_precision(16);
 	  } else {
 		trackball_set_precision(0);
 	  }
