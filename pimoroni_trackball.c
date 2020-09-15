@@ -69,6 +69,8 @@ uint16_t poll_timer = 0;
 uint16_t poll_count = 0;
 static bool trackball_pressed_prev = false;
 
+uint16_t scroll_debounce = 0;
+
 void pointing_device_task(void) {
 
 #ifdef DEBUG_POLLING
@@ -88,16 +90,24 @@ void pointing_device_task(void) {
             if (x != 0 || y != 0) {
                 //uprintf("x %d y %d\n", x, y);
                 dirty = true;
-            }
+            } else { goto no_data; }
             int8_t sx = x < 0 ? -1 : 1;
             int8_t sy = y < 0 ? -1 : 1;
             if (scrolling) {
-                x = abs(x);
-                y = abs(y);
-                x = x * (1 + precisionSpeed) * sx;
-                y = y * (1 + precisionSpeed) * sy;
-                h_offset -= x;
-                v_offset += y;
+                if (scroll_debounce == 0 || timer_elapsed(scroll_debounce) >= 15) {
+                    scroll_debounce = timer_read();
+                    x = abs(x);
+                    y = abs(y);
+                    x = x > 0 ? 1 : x;
+                    y = y > 0 ? 1 : y;
+                    x = x * (1 + precisionSpeed) * sx;
+                    y = y * (1 + precisionSpeed) * sy;
+                    h_offset = x;
+                    v_offset = y;
+                   // uprintf("%d %d %d\n", x, y, v_offset);
+                } else {
+                    dirty = false;
+                }
             } else {
                 // This seems to feel OK if mouse acceleration is turned on
                 // Seems to be okay at the same mouse acceleration as the
@@ -105,23 +115,12 @@ void pointing_device_task(void) {
                 x = x * x * (1 + precisionSpeed) * sx;
                 y = y * y * (1 + precisionSpeed) * sy;
 
-                /* 2^x doesn't feel that great
-                if (x != 0) {
-                    x = abs(x) & 0xF;
-                    x = ((1 << (x-1)) + precisionSpeed*x) * sx;
-                }
-
-                if (y != 0) {
-                    y = abs(y) & 0xF;
-                    y = ((1 << (y-1)) + precisionSpeed*y) * sy;
-                }
-                */
-
                 // Mouse is rotated a bit
                 x_offset -= x;
                 y_offset -= y;
             }
     }
+no_data: ;
 
     const bool trackball_pressed = state[4] & (1 << 7);
     dirty |= trackball_pressed_prev != trackball_pressed;
