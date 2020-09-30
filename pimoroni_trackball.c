@@ -70,6 +70,88 @@ uint16_t poll_count = 0;
 static bool trackball_pressed_prev = false;
 
 uint16_t scroll_debounce = 0;
+uint16_t layer_timer = 0;
+bool is_layer_timer_canceled = false;
+bool is_layer_oneshot_enabled = false;
+uint16_t layer_cancel_count = 0;
+
+bool pm_is_layer_oneshot_enabled(void)
+{
+    return is_layer_oneshot_enabled;
+}
+
+void pm_start_layer(void)
+{
+    layer_timer = timer_read();
+    if (layer_state_is(0) && !pm_is_layer_oneshot_enabled()) {
+        layer_cancel_count = 0;
+        is_layer_timer_canceled = false;
+        is_layer_oneshot_enabled = true;
+        layer_move(2);
+    }
+}
+
+void pm_cancel_layer_all(void)
+{
+    is_layer_oneshot_enabled = false;
+}
+
+void pm_cancel_layer_timer(void)
+{
+    // TODO - maybe instead of hard reset
+    // we add a grace period?
+    if (pm_is_layer_oneshot_enabled()) {
+        ++layer_cancel_count;
+        is_layer_timer_canceled = true;
+    }
+}
+
+void pm_reset_layer(void)
+{
+    if (layer_cancel_count == 0) {
+        layer_cancel_count = 1;
+    }
+    //uprintf("count is %d\n", layer_cancel_count);
+    if (pm_is_layer_oneshot_enabled() && --layer_cancel_count == 0)
+    {
+        //uprintf("reset layer\n");
+        is_layer_oneshot_enabled = false;
+        if (layer_state_is(2)) {
+            layer_move(0);
+        }
+    }
+}
+
+int layer_timer_speed = LAYER_TIMER_MID;
+int layer_set_timer = 0;
+
+void set_layer_timer_speed(int speed)
+{
+    layer_timer_speed = speed;
+    layer_set_timer = timer_read();
+
+    if (speed <= LAYER_TIMER_FAST) {
+        trackball_set_rgbw(0, 0, 0, 200);
+    } else if (speed <= LAYER_TIMER_MID) {
+        trackball_set_rgbw(200, 100, 0, 0);
+    } else {
+        trackball_set_rgbw(200, 0, 0, 0);
+    }
+}
+
+void pm_check_timer(void)
+{
+    if (timer_elapsed(layer_timer) >= layer_timer_speed
+            && pm_is_layer_oneshot_enabled()
+            && !is_layer_timer_canceled) 
+    {
+        //uprintf("timer\n");
+        is_layer_oneshot_enabled = false;
+        if (layer_state_is(2)) {
+            layer_move(0);
+        }
+    }
+}
 
 void pointing_device_task(void) {
 
@@ -77,18 +159,27 @@ void pointing_device_task(void) {
     if (timer_elapsed(poll_timer) >= 1000)
     {
         poll_timer = timer_read();
-        uprintf("Poll count %u\n", poll_count);
+        //uprintf("Poll count %u\n", poll_count);
         poll_count = 0;
     }
     ++poll_count;
 #endif
-    
+
+    if (layer_set_timer > 0 
+            && timer_elapsed(layer_set_timer) >= 500)
+    {
+        layer_set_timer = 0;
+        trackball_set_rgbw(0, 0, 0, 0);
+    }
+
+    bool mouse_moved = false;
     uint8_t state[5] = {};
     if (i2c_readReg(TRACKBALL_WRITE, 0x04, state, 5, I2C_TIMEOUT) == I2C_STATUS_SUCCESS) {
             int16_t x = state[2] - state[3];
             int16_t y = state[1] - state[0];
             if (x != 0 || y != 0) {
                 //uprintf("x %d y %d\n", x, y);
+                mouse_moved = true;
                 dirty = true;
             } else { goto no_data; }
             int8_t sx = x < 0 ? -1 : 1;
@@ -102,7 +193,7 @@ void pointing_device_task(void) {
                     y = y > 0 ? 1 : y;
                     x = x * (1 + precisionSpeed) * sx;
                     y = y * (1 + precisionSpeed) * sy;
-                    h_offset = x;
+                    h_offset = -x;
                     v_offset = y;
                    // uprintf("%d %d %d\n", x, y, v_offset);
                 } else {
@@ -121,6 +212,15 @@ void pointing_device_task(void) {
             }
     }
 no_data: ;
+
+    if (mouse_moved)
+    {
+        pm_start_layer();
+    }
+    else
+    {
+        pm_check_timer();
+    }
 
     const bool trackball_pressed = state[4] & (1 << 7);
     dirty |= trackball_pressed_prev != trackball_pressed;

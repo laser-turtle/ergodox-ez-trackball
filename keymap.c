@@ -49,6 +49,10 @@ enum custom_keycodes {
   PM_LEFT,
   PM_RIGHT,
   PM_MIDDLE,
+  PM_LAYER_FAST,
+  PM_LAYER_MID,
+  PM_LAYER_SLOW,
+  MO_LAYER_0,
   TOGGLE_DEBUG_MODE
 };
 
@@ -69,16 +73,18 @@ enum custom_keycodes {
 // 35332 - ON_RELEASE LAYER 2 [TG(2)]
 // 35076 - ON_PRESS LAYER 2 [TG(2)]
 
+#define _x_ KC_TRANSPARENT
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_ergodox_pretty(
-    KC_ESCAPE, KC_1, KC_2, KC_3, KC_4, KC_5, KC_DELETE, /**/ KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINUS, KC_EQUAL,
-    KC_TAB,    KC_Q, KC_W, KC_E, KC_R, KC_T, TO(2),   /**/ KC_MEH,KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSLASH,
+    KC_ESCAPE, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, /**/ KC_7, KC_8, KC_9, KC_0, KC_MINUS, KC_EQUAL, KC_BSPACE,
+    KC_TAB,    KC_Q, KC_W, KC_E, KC_R, KC_T, MO(1),   /**/ KC_GRAVE,KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSLASH,
     KC_LCTL,   KC_A, KC_S, KC_D, KC_F, KC_G,            /**/ KC_H,  KC_J, KC_K, KC_L, KC_SCOLON,  KC_ENTER,
-    KC_LSHIFT, KC_Z, KC_X, KC_C, KC_V, KC_B, MO(1),     /**/ MO(1), KC_N, KC_M, KC_COMMA, KC_DOT, KC_SLASH, KC_RSHIFT,
+    KC_LSHIFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_QUOTE,     /**/ MO(1), KC_N, KC_M, KC_COMMA, KC_DOT, KC_SLASH, KC_RSHIFT,
 
-    TO(4), KC_QUOTE, LALT(KC_LSHIFT), KC_LALT, KC_LGUI, /**/ KC_TRANSPARENT, KC_DOWN, KC_LBRACKET, KC_RBRACKET, KC_GRAVE,
-                                 LALT_T(KC_APPLICATION),KC_LGUI,        KC_LALT,        LCTL_T(KC_NO),
-                                 KC_HOME,        KC_PGUP,
+    TO(4), KC_DELETE, LALT(KC_LSHIFT), KC_LALT, KC_LGUI, /**/ KC_TRANSPARENT, KC_DOWN, KC_LBRACKET, KC_RBRACKET, KC_MEH,
+                                 PM_LAYER_FAST, PM_LAYER_MID,        KC_HOME,        PM_LAYER_SLOW,
+                                 TO(2),        KC_PGUP,
                                  KC_SPACE,       KC_BSPACE,      LT(2, KC_END),         KC_PGDOWN,      KC_ESCAPE,      KC_ENTER
   ),
   [1] = LAYOUT_ergodox_pretty(
@@ -86,20 +92,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TRANSPARENT, KC_EXLM,  KC_AT,          KC_LCBR,        KC_RCBR,        KC_PIPE,        KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_UP,          KC_7,           KC_8,           KC_9,           KC_ASTR,        KC_F12,
     KC_TRANSPARENT, KC_HASH,  KC_DLR,         KC_LPRN,        KC_RPRN,        KC_GRAVE,                                                                       KC_DOWN,        KC_4,           KC_5,           KC_6,           KC_PLUS,        KC_TRANSPARENT,
     KC_TRANSPARENT, KC_PERC,  KC_CIRC,        KC_LBRACKET,    KC_RBRACKET,    KC_TILD,        KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_AMPR,        KC_1,           KC_2,           KC_3,           KC_BSLASH,      KC_TRANSPARENT,
-    KC_TRANSPARENT, KC_EQUAL, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                                                                                 KC_TRANSPARENT, KC_DOT,         KC_0,           KC_EQUAL,       KC_MINUS,
+    KC_TRANSPARENT, KC_EQUAL, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                                                                                 KC_TRANSPARENT, KC_0,         KC_DOT,           KC_EQUAL,       KC_MINUS,
                                                                                                     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
                                                                                                                     KC_TRANSPARENT, KC_TRANSPARENT,
                                                                                     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
   ),
   [2] = LAYOUT_ergodox_pretty(
-    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, PM_MIDDLE, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-    KC_TRANSPARENT, KC_TRANSPARENT, PM_PRECISION, PM_PRECISION_2,           PM_PRECISION_3, KC_TRANSPARENT, TO(0),                                 KC_TRANSPARENT, KC_TRANSPARENT, PM_LEFT,KC_UP,          PM_RIGHT, KC_TRANSPARENT, KC_TRANSPARENT,
-    KC_TRANSPARENT, KC_TRANSPARENT, PM_RIGHT,     PM_MIDDLE,     PM_LEFT,     PM_SCROLL,                                                                           KC_MEDIA_PREV_TRACK,KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_MEDIA_NEXT_TRACK,KC_MEDIA_PLAY_PAUSE,
-    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_WWW_FORWARD, KC_WWW_BACK, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_TRANSPARENT, PM_PRECISION, PM_PRECISION_2,           PM_PRECISION_3, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, PM_LEFT,KC_UP,          PM_RIGHT, PM_MIDDLE, KC_TRANSPARENT,
+    KC_TRANSPARENT, KC_NO, PM_RIGHT,     PM_MIDDLE,     PM_LEFT,     PM_SCROLL,                                                                           KC_MEDIA_PREV_TRACK,KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_MEDIA_NEXT_TRACK,KC_MEDIA_PLAY_PAUSE,
+    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, TO(0),                                 KC_TRANSPARENT, KC_WWW_FORWARD, KC_WWW_BACK, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
     KC_TRANSPARENT, WEBUSB_PAIR,    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                                                                                 KC_TRANSPARENT, KC_AUDIO_VOL_DOWN,KC_AUDIO_VOL_UP,KC_AUDIO_MUTE,  KC_TRANSPARENT,
                                                                                                     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
                                                                                                                     KC_TRANSPARENT, KC_TRANSPARENT,
-                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
+                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, MO_LAYER_0, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
   ),
   [3] = LAYOUT_ergodox_pretty(
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 TO(1), KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, RESET,
@@ -112,24 +118,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                                                                     RGB_VAD,        RGB_VAI,        HSV_27_255_255, KC_TRANSPARENT, RGB_HUD,        RGB_HUI
   ),
   [4] = LAYOUT_ergodox_pretty(
-    KC_ESCAPE, TO(0),          KC_1,           KC_2,           KC_3,           KC_4,           KC_5,                                           KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_MINUS, KC_EQUAL,
-    KC_TRANSPARENT, KC_I,           KC_Q,           KC_W,           KC_E,           KC_R,           KC_G,                                           KC_Y,           PM_MIDDLE,     PM_LEFT,     KC_UP,          PM_RIGHT,     KC_TRANSPARENT, KC_TRANSPARENT,
-    KC_COMMA, PM_SCROLL,           KC_A,           KC_S,           KC_D,           KC_F,                                                                           KC_TRANSPARENT, KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_TRANSPARENT, KC_TRANSPARENT,
-    KC_TRANSPARENT, KC_O,           KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,                                           KC_DELETE, KC_TRANSPARENT, KC_TRANSPARENT, KC_J,           KC_K,           KC_TRANSPARENT, KC_O,
-    TO(5), KC_T, PM_MIDDLE, PM_RIGHT, PM_LEFT,                                                                                                 KC_TRANSPARENT, KC_L,           KC_TRANSPARENT, KC_TRANSPARENT, KC_U,
-                                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-                                                                                                                    KC_TRANSPARENT, KC_TRANSPARENT,
-                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
+    _x_, _x_, _x_, _x_, _x_, _x_, _x_,    _x_, _x_, _x_, _x_, _x_, _x_, _x_,
+    _x_, _x_, _x_, _x_, _x_, _x_, _x_,    _x_, PM_MIDDLE, PM_LEFT, KC_UP, PM_RIGHT, _x_, _x_,
+    _x_, _x_, _x_, _x_, _x_, _x_,         _x_, KC_LEFT, KC_DOWN, KC_RIGHT, _x_, _x_,
+    _x_, _x_, _x_, _x_, _x_, _x_, _x_,    _x_, _x_, _x_, _x_, _x_, _x_, _x_,
+    TO(5), _x_, PM_MIDDLE, PM_RIGHT, PM_LEFT,   _x_, _x_, _x_, _x_, _x_,
+                   _x_, _x_, _x_, _x_,
+                   TO(0), _x_,
+                   _x_, _x_,  _x_, _x_, _x_, _x_ 
   ),
   [5] = LAYOUT_ergodox_pretty(
-    KC_ESCAPE, TO(0),          KC_1,           KC_2,           KC_3,           KC_4,           KC_5,                                           KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_MINUS, KC_EQUAL,
-    KC_TRANSPARENT, KC_I,           KC_Q,           KC_UP,           KC_E,           KC_R,           KC_G,                                           KC_Y,           PM_MIDDLE,     PM_LEFT,     KC_UP,          PM_RIGHT,     KC_TRANSPARENT, KC_TRANSPARENT,
-    KC_COMMA, PM_SCROLL,           KC_LEFT,           KC_DOWN,           KC_RIGHT,           KC_F,                                                                           KC_TRANSPARENT, KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_TRANSPARENT, KC_TRANSPARENT,
-    KC_TRANSPARENT, KC_O,           KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,                                           KC_DELETE, KC_TRANSPARENT, KC_TRANSPARENT, KC_J,           KC_K,           KC_TRANSPARENT, KC_O,
-    TO(4), KC_T, PM_MIDDLE, PM_RIGHT, PM_LEFT,                                                                                                 KC_TRANSPARENT, KC_L,           KC_TRANSPARENT, KC_TRANSPARENT, KC_U,
-                                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-                                                                                                                    KC_TRANSPARENT, KC_TRANSPARENT,
-                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
+    _x_, _x_, _x_, _x_, _x_, _x_, _x_,    _x_, _x_, _x_, _x_, _x_, _x_, _x_,
+    _x_, _x_, KC_UP, _x_, _x_, _x_, _x_,    _x_, PM_MIDDLE, PM_LEFT, KC_UP, PM_RIGHT, _x_, _x_,
+    _x_, KC_LEFT, KC_DOWN, KC_RIGHT, _x_, _x_,         _x_, KC_LEFT, KC_DOWN, KC_RIGHT, _x_, _x_,
+    _x_, _x_, _x_, _x_, _x_, _x_, _x_,    _x_, _x_, _x_, _x_, _x_, _x_, _x_,
+    TO(4), _x_, PM_MIDDLE, PM_RIGHT, PM_LEFT,   _x_, _x_, _x_, _x_, _x_,
+                   _x_, _x_, _x_, _x_,
+                   TO(0), _x_,
+                   _x_, _x_,  _x_, _x_, _x_, _x_ 
   ),
 };
 
@@ -139,7 +145,7 @@ void run_trackball_cleanup(void) {
     } else if (trackball_get_precision() != 0) {
       //  trackball_set_rgbw(RGB_GREEN, 0x00);
     } else {
-        trackball_set_rgbw(0, 0, 0, 0);
+        //trackball_set_rgbw(0, 0, 0, 0);
     }
 }
 
@@ -148,9 +154,43 @@ void keyboard_post_init_user(void)
 //	trackball_set_rgbw(RGB_MAGENTA, 0x00);
 }
 
+void post_process_record_user(uint16_t keycode, keyrecord_t *record)
+{
+  //uprintf("post record\n");
+  if (pm_is_layer_oneshot_enabled()) {
+      if (!record->event.pressed) {
+          //uprintf("key released\n");
+          pm_reset_layer();
+      }
+  }
+}
+
+void do_trackball_precision(uint16_t level, uint16_t keycode, keyrecord_t *record)
+{
+  if (record->event.pressed) {
+    trackball_set_precision(level);
+  } else if (trackball_get_precision() == level) {
+    trackball_set_precision(0);
+  }
+  run_trackball_cleanup();
+  post_process_record_user(keycode, record);
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  if (record->event.pressed) {
+    pm_cancel_layer_timer();
+  }
+
   switch (keycode) {
+    case 20496: // TO(2)
+        if (record->event.pressed) {
+            if (pm_is_layer_oneshot_enabled()) {
+                // Cancel our reset to layer 2
+                pm_cancel_layer_all();
+                return false;
+            }
+        }
+        return true;
     case RGB_SLD:
       if (record->event.pressed) {
         rgblight_mode(1);
@@ -177,40 +217,49 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	case PM_SCROLL:
 	  trackball_set_scrolling(record->event.pressed);
 	  run_trackball_cleanup();
+      post_process_record_user(keycode, record);
 	  return false;
 	case PM_LEFT:
 	  trackball_set_left(record->event.pressed);
+      post_process_record_user(keycode, record);
 	  return false;
 	case PM_RIGHT:
 	  trackball_set_right(record->event.pressed);
+      post_process_record_user(keycode, record);
 	  return false;
 	case PM_MIDDLE:
 	  trackball_set_middle(record->event.pressed);
+      post_process_record_user(keycode, record);
 	  return false;
 	case PM_PRECISION:
-	  if (record->event.pressed) {
-		trackball_set_precision(2);
-	  } else {
-		trackball_set_precision(0);
-	  }
-	  run_trackball_cleanup();
+      do_trackball_precision(2, keycode, record);
 	  return false;
 	case PM_PRECISION_2:
-	  if (record->event.pressed) {
-		trackball_set_precision(8);
-	  } else {
-		trackball_set_precision(0);
-	  }
-	  run_trackball_cleanup();
+      do_trackball_precision(8, keycode, record);
 	  return false;
 	case PM_PRECISION_3:
-	  if (record->event.pressed) {
-		trackball_set_precision(16);
-	  } else {
-		trackball_set_precision(0);
-	  }
-	  run_trackball_cleanup();
+      do_trackball_precision(16, keycode, record);
 	  return false;
+    case PM_LAYER_FAST:
+      set_layer_timer_speed(LAYER_TIMER_FAST);
+      post_process_record_user(keycode, record);
+      return false;
+    case PM_LAYER_MID:
+      set_layer_timer_speed(LAYER_TIMER_MID);
+      post_process_record_user(keycode, record);
+      return false;
+    case PM_LAYER_SLOW:
+      set_layer_timer_speed(LAYER_TIMER_SLOW);
+      post_process_record_user(keycode, record);
+      return false;
+    case MO_LAYER_0:
+      if (record->event.pressed) {
+        layer_move(0);
+      } else {
+        layer_move(2);
+      }
+      post_process_record_user(keycode, record);
+      return false;
 	  /*
 	case TOGGLE_DEBUG_MODE:
 	  if (record->event.pressed) {
