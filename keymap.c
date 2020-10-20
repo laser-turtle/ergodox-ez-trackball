@@ -82,7 +82,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_LCTL,   KC_A, KC_S, KC_D, KC_F, KC_G,            /**/ KC_H,  KC_J, KC_K, KC_L, KC_SCOLON,  KC_ENTER,
     KC_LSHIFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_QUOTE,     /**/ MO(1), KC_N, KC_M, KC_COMMA, KC_DOT, KC_SLASH, KC_RSHIFT,
 
-    TO(4), KC_DELETE, LALT(KC_LSHIFT), KC_LALT, KC_LGUI, /**/ KC_TRANSPARENT, KC_DOWN, KC_LBRACKET, KC_RBRACKET, KC_MEH,
+    TO(4), KC_DELETE, LALT(KC_LSHIFT), KC_LALT, KC_LGUI, /**/ KC_TRANSPARENT, KC_LBRACKET, KC_RBRACKET, KC_MEH, KC_RCTL,
                                  PM_LAYER_FAST, PM_LAYER_MID,        KC_HOME,        PM_LAYER_SLOW,
                                  TO(2),        KC_PGUP,
                                  KC_SPACE,       KC_BSPACE,      LT(2, KC_END),         KC_PGDOWN,      KC_ESCAPE,      KC_ENTER
@@ -241,15 +241,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       do_trackball_precision(16, keycode, record);
 	  return false;
     case PM_LAYER_FAST:
-      set_layer_timer_speed(LAYER_TIMER_FAST);
+      increase_layer_timer();
       post_process_record_user(keycode, record);
       return false;
     case PM_LAYER_MID:
-      set_layer_timer_speed(LAYER_TIMER_MID);
+      reset_layer_timer();
       post_process_record_user(keycode, record);
       return false;
     case PM_LAYER_SLOW:
-      set_layer_timer_speed(LAYER_TIMER_SLOW);
+      decrease_layer_timer();
       post_process_record_user(keycode, record);
       return false;
     case MO_LAYER_0:

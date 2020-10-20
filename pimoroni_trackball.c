@@ -124,19 +124,36 @@ void pm_reset_layer(void)
 
 int layer_timer_speed = LAYER_TIMER_MID;
 int layer_set_timer = 0;
+bool layer_timer_on = false;
 
-void set_layer_timer_speed(int speed)
+int min(int a, int b)
 {
-    layer_timer_speed = speed;
-    layer_set_timer = timer_read();
+    return a < b ? a : b;
+}
 
-    if (speed <= LAYER_TIMER_FAST) {
-        trackball_set_rgbw(0, 0, 0, 200);
-    } else if (speed <= LAYER_TIMER_MID) {
-        trackball_set_rgbw(200, 100, 0, 0);
-    } else {
-        trackball_set_rgbw(200, 0, 0, 0);
-    }
+void set_layer_speed(int speed)
+{
+    layer_timer_speed = max(0, min(2000, speed));
+    layer_set_timer = timer_read();
+    layer_timer_on = true;
+}
+
+void reset_layer_timer(void)
+{
+    trackball_set_rgbw(200, 0, 0, 0);
+    set_layer_speed(LAYER_TIMER_MID);
+}
+
+void increase_layer_timer(void)
+{
+    trackball_set_rgbw(200, 100, 0, 0);
+    set_layer_speed(layer_timer_speed + 50);
+}
+
+void decrease_layer_timer(void)
+{
+    trackball_set_rgbw(0, 0, 0, 200);
+    set_layer_speed(layer_timer_speed - 50);
 }
 
 void pm_check_timer(void)
@@ -165,10 +182,11 @@ void pointing_device_task(void) {
     ++poll_count;
 #endif
 
-    if (layer_set_timer > 0 
-            && timer_elapsed(layer_set_timer) >= 500)
+    if (layer_timer_on
+         && timer_elapsed(layer_set_timer) >= 500)
     {
         layer_set_timer = 0;
+        layer_timer_on = false;
         trackball_set_rgbw(0, 0, 0, 0);
     }
 
